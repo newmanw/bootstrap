@@ -436,7 +436,7 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
     restrict: 'EA',
     require: 'ngModel',
     scope: {
-      isOpen: '=?',
+      popupState: '=?',
       currentText: '@',
       clearText: '@',
       closeText: '@',
@@ -448,6 +448,12 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
           appendToBody = angular.isDefined(attrs.datepickerAppendToBody) ? scope.$parent.$eval(attrs.datepickerAppendToBody) : datepickerPopupConfig.appendToBody;
 
       scope.showButtonBar = angular.isDefined(attrs.showButtonBar) ? scope.$parent.$eval(attrs.showButtonBar) : datepickerPopupConfig.showButtonBar;
+
+      if (!scope.popupState) {
+        scope.popupState = {
+          open: false
+        };
+      }
 
       scope.getText = function( key ) {
         return scope[key + 'Text'] || datepickerPopupConfig[key + 'Text'];
@@ -537,7 +543,7 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
         ngModel.$render();
 
         if ( closeOnDateSelection ) {
-          scope.isOpen = false;
+          scope.popupState.open = false;
           element[0].focus();
         }
       };
@@ -556,9 +562,9 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
       };
 
       var documentClickBind = function(event) {
-        if (scope.isOpen && event.target !== element[0]) {
+        if (scope.popupState.open && event.target !== element[0]) {
           scope.$apply(function() {
-            scope.isOpen = false;
+            scope.popupState.open = false;
           });
         }
       };
@@ -571,17 +577,17 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
       scope.keydown = function(evt) {
         if (evt.which === 27) {
           evt.preventDefault();
-          if (scope.isOpen) {
+          if (scope.popupState.open) {
             evt.stopPropagation();
           }
           scope.close();
-        } else if (evt.which === 40 && !scope.isOpen) {
-          scope.isOpen = true;
+        } else if (evt.which === 40 && !scope.popupState.open) {
+          scope.popupState.open = true;
         }
       };
 
-      scope.$watch('isOpen', function(value) {
-        if (value) {
+      scope.$watch('popupState', function(state) {
+        if (state && state.open) {
           scope.$broadcast('datepicker.focus');
           scope.position = appendToBody ? $position.offset(element) : $position.position(element);
           scope.position.top = scope.position.top + element.prop('offsetHeight');
@@ -606,7 +612,7 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
       };
 
       scope.close = function() {
-        scope.isOpen = false;
+        scope.popupState.open = false;
         element[0].focus();
       };
 

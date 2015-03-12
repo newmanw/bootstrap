@@ -1,4 +1,6 @@
 angular.module('ui.bootstrap.demo').controller('DatepickerDemoCtrl', function ($scope) {
+  $scope.popupState = {open: false};
+
   $scope.today = function() {
     $scope.dt = new Date();
   };
@@ -22,7 +24,7 @@ angular.module('ui.bootstrap.demo').controller('DatepickerDemoCtrl', function ($
     $event.preventDefault();
     $event.stopPropagation();
 
-    $scope.opened = true;
+    $scope.popupState.open = true;
   };
 
   $scope.dateOptions = {
